@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 
 import { ImageButton } from '../components';
-import { ImageCropperController } from './ImageCropperController';
+import { ImageCropperController } from './controller';
 
 import './ImageCropper.css';
 

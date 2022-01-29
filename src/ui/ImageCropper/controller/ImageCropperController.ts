@@ -1,9 +1,11 @@
 import { fabric } from 'fabric';
 import invariant from "invariant";
 
+import { ImageLoader } from './ImageLoader';
+
 export class ImageCropperController {
 
-  lastSrcImage = '';
+  imageLoader: ImageLoader;
 
   canvas: fabric.Canvas;
 
@@ -13,35 +15,17 @@ export class ImageCropperController {
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = new fabric.Canvas(canvas);
+    this.imageLoader = new ImageLoader();
   }
 
   destroy() {
 
   }
 
-  checkLastSrcImage(srcImage: string) {
-    if (srcImage === this.lastSrcImage) {
-      this.lastSrcImage = '';
-
-      return true;
-    }
-
-    return false;
-  }
-
-  handleImageLoaded(srcImage: string, image: fabric.Image) {
-    if (!this.checkLastSrcImage(srcImage)) {
-      return;
-    }
-
-    if (this.image) {
-      this.canvas.remove(this.image);
-    }
-
+  setImage(image: fabric.Image) {
     const imageElement = image.getElement();
 
     invariant(imageElement instanceof HTMLImageElement, 'Image element should be a HTMLImageElement');
-
     // imageElement.naturalHeight;
     const width = 100;
     const height = 100;
@@ -58,20 +42,25 @@ export class ImageCropperController {
       lockRotation: true,
       lockUniScaling: true,
       /*
-      skewX: width / imageElement.naturalWidth,
-      skewY: height / imageElement.naturalHeight,
+        skewX: width / imageElement.naturalWidth,
+        skewY: height / imageElement.naturalHeight,
        */
     });
 
+    if (this.image) {
+      this.canvas.remove(this.image);
+    }
+
     this.image = image;
     this.canvas.add(this.image);
-  };
+  }
 
-  newImage(image: string) {
-    this.lastSrcImage = image;
+  async newImage(imageSrc: string) {
+    try {
+      let image = await this.imageLoader.load(imageSrc);
 
-    const handleImageLoaded = this.handleImageLoaded.bind(this, image);
-    fabric.Image.fromURL(image, handleImageLoaded);
+      this.setImage(image);
+    } catch (error) {}
   }
 
 }

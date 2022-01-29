@@ -1,0 +1,2 @@
+
+export { ImageCropperController } from './ImageCropperController';
