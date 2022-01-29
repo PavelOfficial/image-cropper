@@ -1,0 +1,12 @@
+.App {
+  display: flex;
+  justify-content: center;
+  padding: 50px;
+  text-align: center;
+}
+
+.App canvas {
+  background: #ffffff;
+  height: 300px;
+  width: 600px;
+}
