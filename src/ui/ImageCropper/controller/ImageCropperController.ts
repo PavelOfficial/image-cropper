@@ -1,4 +1,6 @@
 import { fabric } from 'fabric';
+import { IEvent } from "fabric/fabric-impl";
+
 import invariant from "invariant";
 
 import { ImageLoader } from './ImageLoader';
@@ -13,13 +15,28 @@ export class ImageCropperController {
 
   crop: fabric.Image| null = null;
 
+  cropEditing = false;
+
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = new fabric.Canvas(canvas);
+    this.canvas.on('mouse:dblclick', this.handleDblclick);
     this.imageLoader = new ImageLoader();
+  }
+
+  handleDblclick = (event: IEvent<MouseEvent>) => {
+    if (event.target === this.image) {
+      this.setCropEditing(!this.cropEditing);
+      console.log('image clicked !!!');
+    }
   }
 
   destroy() {
 
+  }
+
+  setCropEditing(isCropEditing: boolean) {
+    this.cropEditing = isCropEditing;
+    console.log(this.cropEditing);
   }
 
   setImage(image: fabric.Image) {
