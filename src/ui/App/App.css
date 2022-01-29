@@ -5,8 +5,6 @@
   text-align: center;
 }
 
-.App canvas {
-  background: #ffffff;
-  height: 300px;
-  width: 600px;
+.App h3 {
+  font-size: 20px;
 }
