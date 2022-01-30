@@ -4,9 +4,12 @@ import { Picture } from './Picture';
 import { geometry } from '../geometry';
 import { PictureHandle } from './PictureHandle';
 
+type FabricHandler = (event: fabric.IEvent<Event>) => void;
+
 const emptyImage = new fabric.Image('');
 const emptyPicture = new Picture(emptyImage);
 const pictureHandle = new PictureHandle();
+const emptyOnDragOver: FabricHandler = () => undefined;
 
 export class CropperView {
 
@@ -22,12 +25,24 @@ export class CropperView {
 
   height = 600;
 
+  _onDragOver: FabricHandler = emptyOnDragOver;
+
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = new fabric.Canvas(canvas, {
       width: this.width,
       height: this.height,
     });
   }
+
+  set onDragOver(handleDragOver: FabricHandler) {
+    if (handleDragOver) {
+      this._onDragOver = handleDragOver;
+      this.canvas.on('dragover', this._onDragOver);
+    } else {
+      this.canvas.off('dragover', this._onDragOver);
+    }
+  }
+
 
   get size() {
     return {

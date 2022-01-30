@@ -1,5 +1,5 @@
 import { fabric } from 'fabric';
-import {Layout} from "../types";
+import {Layout, Position} from "../types";
 
 type Options = {
   cornerStyle: 'circle' | 'rect' | undefined,
@@ -66,6 +66,13 @@ export class PictureHandle {
     layout = this.normalizeLayout(layout);
 
     this.rect.set(layout);
+  }
+
+  getPosition(): Position {
+    return {
+      top: this.rect.get('top') || 0,
+      left: this.rect.get('left') || 0,
+    };
   }
 
 }

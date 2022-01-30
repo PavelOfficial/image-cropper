@@ -1,5 +1,6 @@
-import { ImageLoader } from './ImageLoader';
+import { fabric } from 'fabric';
 
+import { ImageLoader } from './ImageLoader';
 import { CropperView } from '../views/CropperView';
 
 export class CropperController {
@@ -13,7 +14,16 @@ export class CropperController {
   constructor(htmlCanvas: HTMLCanvasElement) {
     this.imageLoader = new ImageLoader();
     this.cropperView = new CropperView(htmlCanvas);
+
+    this.cropperView.canvas.on('object:moving', this.handleMoving);
   }
+
+  handleMoving = (event: fabric.IEvent<Event>) => {
+    if (event.target === this.cropperView.pictureHandle.getRect()) {
+      const position = this.cropperView.pictureHandle.getPosition();
+      this.cropperView.picture.setPosition(position);
+    }
+  };
 
   destroy() {
     //

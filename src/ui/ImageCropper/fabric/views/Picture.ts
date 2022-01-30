@@ -1,7 +1,7 @@
 import { fabric } from 'fabric';
 import invariant from 'invariant';
 
-import { Layout, WORKING_MODE } from '../types';
+import { Layout, WORKING_MODE, Position } from '../types';
 import { CropArea } from './CropArea';
 
 type Options = {
@@ -108,6 +108,10 @@ export class Picture {
     this.image = image;
     this.image.set(Picture.options[this.mode]);
     this.image.setControlsVisibility(Picture.controlsVisibility[this.mode]);
+  }
+
+  setPosition(position: Position) {
+    this.image.set(position);
   }
 
   getCropArea(layout: Layout) {
