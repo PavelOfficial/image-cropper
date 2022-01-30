@@ -1,0 +1,1 @@
+export { CropperController } from './CropperController';

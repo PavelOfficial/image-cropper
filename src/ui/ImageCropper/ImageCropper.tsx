@@ -1,22 +1,22 @@
 import React, { useEffect, useRef } from 'react';
 
 import { ImageButton } from '../components';
-import { ImageCropperController } from './controller';
+import { CropperController } from './fabric/controller';
 
 import './ImageCropper.css';
 
 const emptyCanvasElement = document.createElement('canvas');
-const emptyImageCropperController = new ImageCropperController(emptyCanvasElement);
+const emptyImageCropperController = new CropperController(emptyCanvasElement);
 
 export const ImageCropper = () => {
-  const controller = useRef<ImageCropperController>(emptyImageCropperController);
+  const controller = useRef<CropperController>(emptyImageCropperController);
   const canvas = useRef<HTMLCanvasElement>(emptyCanvasElement);
   const handleLoad = (image: string) => {
     controller.current.newImage(image);
   };
 
   useEffect(() => {
-    controller.current = new ImageCropperController(canvas.current);
+    controller.current = new CropperController(canvas.current);
 
     return () => {
       controller.current.destroy();

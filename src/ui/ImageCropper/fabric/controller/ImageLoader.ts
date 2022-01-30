@@ -1,7 +1,6 @@
 import {fabric} from "fabric";
 import invariant from "invariant";
 
-
 export class ImageLoader {
 
   lastSrcImage = '';
@@ -41,4 +40,5 @@ export class ImageLoader {
       });
     });
   }
+
 }
