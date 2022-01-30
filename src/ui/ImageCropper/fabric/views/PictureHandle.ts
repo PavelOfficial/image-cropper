@@ -1,5 +1,5 @@
 import { fabric } from 'fabric';
-import {Layout, Position} from "../types";
+import { Layout, Position } from '../types';
 
 type Options = {
   cornerStyle: 'circle' | 'rect' | undefined,
@@ -7,6 +7,9 @@ type Options = {
   cornerColor: string,
   transparentCorners: boolean,
   cornerStrokeColor: string,
+  lockScalingFlip: boolean,
+  noScaleCache: boolean,
+  strokeUniform: boolean,
 
   hasBorders: boolean,
   strokeWidth: number,
@@ -24,6 +27,9 @@ export class PictureHandle {
     cornerColor: '#f4fdfd',
     transparentCorners: false,
     cornerStrokeColor: '#226fd9',
+    lockScalingFlip: true,
+    strokeUniform: true,
+    noScaleCache: true,
 
     hasBorders: false,
     stroke: '#1456b6',
@@ -56,7 +62,7 @@ export class PictureHandle {
     return {
       ...layout,
       width: layout.width * layout.scaleX,
-      height: layout.width * layout.scaleY,
+      height: layout.height * layout.scaleY,
       scaleX: 1,
       scaleY: 1,
     };
@@ -66,6 +72,17 @@ export class PictureHandle {
     layout = this.normalizeLayout(layout);
 
     this.rect.set(layout);
+  }
+
+  getLayout(): Layout {
+    return {
+      width: this.rect.get('width') || 0,
+      height: this.rect.get('height') || 0,
+      top: this.rect.get('top') || 0,
+      left: this.rect.get('left') || 0,
+      scaleX: this.rect.get('scaleX') || 1,
+      scaleY: this.rect.get('scaleY') || 1,
+    };
   }
 
   getPosition(): Position {

@@ -89,15 +89,6 @@ export class Picture {
     },
   };
 
-  layout:Layout = {
-    top: 0,
-    left: 0,
-    width: 0,
-    height: 0,
-    scaleX: 1,
-    scaleY: 1,
-  };
-
   cropArea = emptyCropArea;
 
   image: fabric.Image;
@@ -124,15 +115,48 @@ export class Picture {
 
   initLayout(layout: Layout) {
     this.cropArea = this.getCropArea(layout);
-    this.layout = layout;
     this.image.set({
       ...layout,
       clipPath: this.cropArea.getRect(),
     });
   }
 
+  normalizeLayout(layout: Layout) {
+    const width = layout.width * layout.scaleX;
+    const height = layout.height * layout.scaleY;
+
+    const currentLayout = this.getLayout();
+    const currentWidth = currentLayout.width;
+    const currentHeight = currentLayout.height;
+
+    const scaleX = width / currentLayout.width;
+    const scaleY = height / currentLayout.height;
+
+    return {
+      ...layout,
+      width: currentWidth,
+      height: currentHeight,
+      scaleX,
+      scaleY,
+    };
+  }
+
   getLayout(): Layout {
-    return this.layout;
+    return {
+      width: this.image.get('width') || 0,
+      height: this.image.get('height') || 0,
+      top: this.image.get('top') || 0,
+      left: this.image.get('left') || 0,
+      scaleX: this.image.get('scaleX') || 1,
+      scaleY: this.image.get('scaleY') || 1,
+    };
+  }
+
+  setLayout(layout: Layout) {
+    layout = this.normalizeLayout(layout);
+    this.image.set({
+      ...layout,
+    });
   }
 
   getNaturalSize() {

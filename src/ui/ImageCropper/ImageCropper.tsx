@@ -19,7 +19,7 @@ export const ImageCropper = () => {
     controller.current = new CropperController(canvas.current);
 
     return () => {
-      controller.current.destroy();
+      controller.current.unsubscribe();
     };
   }, []);
 

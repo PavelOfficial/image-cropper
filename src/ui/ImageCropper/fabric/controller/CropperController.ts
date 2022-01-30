@@ -15,19 +15,28 @@ export class CropperController {
     this.imageLoader = new ImageLoader();
     this.cropperView = new CropperView(htmlCanvas);
 
-    this.cropperView.canvas.on('object:moving', this.handleMoving);
+    this.cropperView.onUpdate = this.subscribe;
   }
 
-  handleMoving = (event: fabric.IEvent<Event>) => {
-    if (event.target === this.cropperView.pictureHandle.getRect()) {
-      const position = this.cropperView.pictureHandle.getPosition();
-      this.cropperView.picture.setPosition(position);
-    }
+  unsubscribe = () => {
+    const pictureHandleRect = this.cropperView.pictureHandle.getRect();
+
+    pictureHandleRect.off('moving', this.updateWithPictureHandle);
+    pictureHandleRect.off('scaling', this.updateWithPictureHandle);
   };
 
-  destroy() {
-    //
-  }
+  subscribe = () => {
+    const pictureHandleRect = this.cropperView.pictureHandle.getRect();
+    this.unsubscribe();
+
+    pictureHandleRect.on('moving', this.updateWithPictureHandle);
+    pictureHandleRect.on('scaling', this.updateWithPictureHandle);
+  };
+
+  updateWithPictureHandle = () => {
+    const layout = this.cropperView.pictureHandle.getLayout();
+    this.cropperView.picture.setLayout(layout);
+  };
 
   setCropEditing(isCropEditing: boolean) {
     this.cropEditing = isCropEditing;

@@ -27,6 +27,8 @@ export class CropperView {
 
   _onDragOver: FabricHandler = emptyOnDragOver;
 
+  onUpdate = () => {};
+
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = new fabric.Canvas(canvas, {
       width: this.width,
@@ -80,6 +82,7 @@ export class CropperView {
 
     this.updatePicture(picture);
     this.updatePictureHandle(pictureHandle);
+    this.onUpdate();
   }
 
   setPictureImage(image: fabric.Image) {
