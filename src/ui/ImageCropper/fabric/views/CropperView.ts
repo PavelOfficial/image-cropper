@@ -2,17 +2,17 @@ import { fabric } from 'fabric';
 
 import { Picture } from './Picture';
 import { geometry } from '../geometry';
-import { CropArea } from './CropArea';
+import { PictureHandle } from './PictureHandle';
 
 const emptyImage = new fabric.Image('');
 const emptyPicture = new Picture(emptyImage);
-const emptyCropArea = new CropArea();
+const pictureHandle = new PictureHandle();
 
 export class CropperView {
 
-  picture = emptyPicture;
+  pictureHandle: PictureHandle = pictureHandle;
 
-  cropArea = emptyCropArea;
+  picture: Picture = emptyPicture;
 
   canvas: fabric.Canvas;
 
@@ -39,18 +39,9 @@ export class CropperView {
   fitToCanvasCenter(picture: Picture) {
     const layout = geometry.fitToCenter(this.size, picture.getNaturalSize(), this.padding);
 
-    picture.setLayout(layout);
+    picture.initLayout(layout);
 
     return picture;
-  }
-
-  getCropArea(picture: Picture) {
-    const layout = picture.getLayout();
-    const cropArea = new CropArea();
-
-    cropArea.setLayout(layout);
-
-    return cropArea;
   }
 
   updatePicture(picture: Picture) {
@@ -59,18 +50,21 @@ export class CropperView {
     this.canvas.add(picture.getImage());
   }
 
-  updateCropArea(cropArea: CropArea) {
-    this.canvas.remove(this.cropArea.getRect());
-    this.cropArea = cropArea;
-    this.canvas.add(this.cropArea.getRect());
+  updatePictureHandle(pictureHandle: PictureHandle) {
+    this.canvas.remove(this.pictureHandle.getRect());
+    this.pictureHandle = pictureHandle;
+    this.canvas.add(pictureHandle.getRect());
   }
 
   setPicture(picture: Picture) {
     picture = this.fitToCanvasCenter(picture);
-    const cropArea =  this.getCropArea(picture);
+
+    const pictureHandle = new PictureHandle();
+
+    pictureHandle.setLayout(picture.getLayout());
 
     this.updatePicture(picture);
-    this.updateCropArea(cropArea);
+    this.updatePictureHandle(pictureHandle);
   }
 
   setPictureImage(image: fabric.Image) {

@@ -1,7 +1,8 @@
 import { fabric } from 'fabric';
-import invariant from "invariant";
+import invariant from 'invariant';
 
-import { Layout } from '../types';
+import { Layout, WORKING_MODE } from '../types';
+import { CropArea } from './CropArea';
 
 type Options = {
   cornerStyle: 'rect' | 'circle' | undefined,
@@ -11,50 +12,81 @@ type Options = {
   cornerStrokeColor: string,
 
   hasBorders: boolean,
-  hasRotatingPoint: boolean,
+  lockScalingFlip: boolean,
   lockMovementX: boolean,
   lockMovementY: boolean,
-  lockRotation: boolean,
-  lockScalingX: boolean,
-  lockScalingY: boolean,
-  lockUniScaling: boolean,
-  lockSkewingX: boolean,
-  lockSkewingY: boolean,
-  lockScalingFlip: boolean,
-}
+
+  hoverCursor: string | undefined,
+  moveCursor: string | undefined,
+
+  selectable: boolean,
+};
+
+type ModeOptions = {
+  [WORKING_MODE.DRAGGING]: Options,
+  [WORKING_MODE.CROPPING]: Options,
+};
+
+const emptyCropArea = new CropArea();
 
 export class Picture {
 
-  controlsVisibility = {
-    'bl': true,
-    'br': true,
-    'tl': true,
-    'tr': true,
-    'mb': false,
-    'ml': false,
-    'mr': false,
-    'mt': false,
-    'mtr': false,
+  static controlsVisibility = {
+    [WORKING_MODE.DRAGGING]: {
+      bl: false,
+      br: false,
+      tl: false,
+      tr: false,
+      mb: false,
+      ml: false,
+      mr: false,
+      mt: false,
+      mtr: false,
+    },
+    [WORKING_MODE.CROPPING]: {
+      bl: true,
+      br: true,
+      tl: true,
+      tr: true,
+      mb: false,
+      ml: false,
+      mr: false,
+      mt: false,
+      mtr: false,
+    },
   };
 
-  options: Options = {
-    cornerStyle: 'circle',
-    cornerSize: 10,
-    cornerColor: '#f4fdfd',
-    transparentCorners: false,
-    cornerStrokeColor: '#226fd9',
+  static options: ModeOptions = {
+    [WORKING_MODE.DRAGGING]: {
+      cornerStyle: 'circle',
+      cornerSize: 10,
+      cornerColor: '#f4fdfd',
+      transparentCorners: false,
+      cornerStrokeColor: '#226fd9',
 
-    hasBorders: false,
-    hasRotatingPoint: false,
-    lockMovementX: false,
-    lockMovementY: false,
-    lockRotation: true,
-    lockScalingX: false,
-    lockScalingY: false,
-    lockUniScaling: true,
-    lockSkewingX: false,
-    lockSkewingY: false,
-    lockScalingFlip: true,
+      hasBorders: false,
+      lockScalingFlip: true,
+      lockMovementX: true,
+      lockMovementY: true,
+      hoverCursor: 'default',
+      moveCursor: 'default',
+      selectable: false,
+    },
+    [WORKING_MODE.CROPPING]: {
+      cornerStyle: 'circle',
+      cornerSize: 10,
+      cornerColor: '#f4fdfd',
+      transparentCorners: false,
+      cornerStrokeColor: '#226fd9',
+
+      hasBorders: true,
+      lockScalingFlip: true,
+      lockMovementX: true,
+      lockMovementY: true,
+      hoverCursor: undefined,
+      moveCursor: undefined,
+      selectable: true,
+    },
   };
 
   layout:Layout = {
@@ -66,17 +98,33 @@ export class Picture {
     scaleY: 1,
   };
 
+  cropArea = emptyCropArea;
+
   image: fabric.Image;
+
+  mode = WORKING_MODE.DEFAULT;
 
   constructor(image: fabric.Image) {
     this.image = image;
-    this.image.set(this.options);
-    this.image.setControlsVisibility(this.controlsVisibility);
+    this.image.set(Picture.options[this.mode]);
+    this.image.setControlsVisibility(Picture.controlsVisibility[this.mode]);
   }
 
-  setLayout(layout: Layout) {
+  getCropArea(layout: Layout) {
+    const cropArea = new CropArea();
+
+    cropArea.setLayout(layout);
+
+    return cropArea;
+  }
+
+  initLayout(layout: Layout) {
+    this.cropArea = this.getCropArea(layout);
     this.layout = layout;
-    this.image.set(layout);
+    this.image.set({
+      ...layout,
+      clipPath: this.cropArea.getRect(),
+    });
   }
 
   getLayout(): Layout {
