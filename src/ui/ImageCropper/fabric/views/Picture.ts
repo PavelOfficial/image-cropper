@@ -40,9 +40,9 @@ export class Picture {
   options: Options = {
     cornerStyle: 'circle',
     cornerSize: 10,
-    cornerColor: '#ffffff',
+    cornerColor: '#f4fdfd',
     transparentCorners: false,
-    cornerStrokeColor: '#000000',
+    cornerStrokeColor: '#226fd9',
 
     hasBorders: false,
     hasRotatingPoint: false,
@@ -57,6 +57,15 @@ export class Picture {
     lockScalingFlip: true,
   };
 
+  layout:Layout = {
+    top: 0,
+    left: 0,
+    width: 0,
+    height: 0,
+    scaleX: 1,
+    scaleY: 1,
+  };
+
   image: fabric.Image;
 
   constructor(image: fabric.Image) {
@@ -65,8 +74,13 @@ export class Picture {
     this.image.setControlsVisibility(this.controlsVisibility);
   }
 
-  setLayout(options: Layout) {
-    this.image.set(options);
+  setLayout(layout: Layout) {
+    this.layout = layout;
+    this.image.set(layout);
+  }
+
+  getLayout(): Layout {
+    return this.layout;
   }
 
   getNaturalSize() {

@@ -1,12 +1,10 @@
-import { fabric } from 'fabric';
-
 import { ImageLoader } from './ImageLoader';
-import { Picture } from '../views/Picture';
-import { CropperCanvas } from '../views/CropperCanvas';
+
+import { CropperView } from '../views/CropperView';
 
 export class CropperController {
 
-  cropperCanvas: CropperCanvas;
+  cropperView: CropperView;
 
   imageLoader: ImageLoader;
 
@@ -14,7 +12,7 @@ export class CropperController {
 
   constructor(htmlCanvas: HTMLCanvasElement) {
     this.imageLoader = new ImageLoader();
-    this.cropperCanvas = new CropperCanvas(htmlCanvas);
+    this.cropperView = new CropperView(htmlCanvas);
   }
 
   destroy() {
@@ -26,17 +24,11 @@ export class CropperController {
     console.log(this.cropEditing);
   }
 
-  setImage(image: fabric.Image) {
-    const picture = new Picture(image);
-
-    this.cropperCanvas.setPicture(picture);
-  }
-
   async newImage(imageSrc: string) {
     try {
       let image = await this.imageLoader.load(imageSrc);
 
-      this.setImage(image);
+      this.cropperView.setPictureImage(image);
     } catch (error) {}
   }
 
