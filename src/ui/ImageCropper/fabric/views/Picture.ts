@@ -22,6 +22,12 @@ type Options = {
   moveCursor: string | undefined,
 
   selectable: boolean,
+
+  strokeWidth: number,
+  stroke: string,
+
+  strokeUniform: boolean,
+  noScaleCache: boolean,
 };
 
 type ModeOptions = {
@@ -73,6 +79,12 @@ export class Picture extends FabricView {
       hoverCursor: 'default',
       moveCursor: 'default',
       selectable: false,
+
+      strokeUniform: true,
+      noScaleCache: false,
+
+      stroke: '#8eabe0',
+      strokeWidth: 2,
     },
     [MODE.CROPPING]: {
       cornerStyle: 'circle',
@@ -88,6 +100,12 @@ export class Picture extends FabricView {
       hoverCursor: undefined,
       moveCursor: undefined,
       selectable: true,
+
+      strokeUniform: true,
+      noScaleCache: false,
+
+      stroke: '#8eabe0',
+      strokeWidth: 2,
     },
   };
 
