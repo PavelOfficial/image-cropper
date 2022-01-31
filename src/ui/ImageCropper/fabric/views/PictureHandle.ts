@@ -1,7 +1,8 @@
 import { fabric } from 'fabric';
 
-import { Layout, MODE, Position } from '../types';
+import { Layout, MODE } from '../types';
 import { DEFAULT_MODE } from '../definitions';
+import { FabricView } from './FabricView';
 
 type Options = {
   cornerStyle: 'circle' | 'rect' | undefined,
@@ -24,7 +25,7 @@ type ModeOptions = {
   [MODE.CROPPING]: Options,
 };
 
-export class PictureHandle {
+export class PictureHandle extends FabricView {
 
   static options: ModeOptions = {
     [MODE.DRAGGING]: {
@@ -35,7 +36,7 @@ export class PictureHandle {
       cornerStrokeColor: '#226fd9',
       lockScalingFlip: true,
       strokeUniform: true,
-      noScaleCache: true,
+      noScaleCache: false,
 
       hasBorders: false,
       stroke: '#1456b6',
@@ -50,7 +51,7 @@ export class PictureHandle {
       cornerStrokeColor: '#226fd9',
       lockScalingFlip: true,
       strokeUniform: true,
-      noScaleCache: true,
+      noScaleCache: false,
 
       hasBorders: false,
       stroke: '#1456b6',
@@ -89,8 +90,13 @@ export class PictureHandle {
   mode:MODE = DEFAULT_MODE;
 
   constructor() {
+    super();
     this.rect = new fabric.Rect({});
     this.updateRectWithMode();
+  }
+
+  get object() {
+    return this.rect;
   }
 
   updateRectWithMode() {
@@ -123,22 +129,77 @@ export class PictureHandle {
     this.rect.set(layout);
   }
 
-  getLayout(): Layout {
-    return {
-      width: this.rect.get('width') || 0,
-      height: this.rect.get('height') || 0,
-      top: this.rect.get('top') || 0,
-      left: this.rect.get('left') || 0,
-      scaleX: this.rect.get('scaleX') || 0,
-      scaleY: this.rect.get('scaleY') || 0,
-    };
+  terminateScale(boxAbsoluteLayout: Layout) {
+    const handleAbsoluteLayout = this.getAbsoluteLayout();
+    let top = handleAbsoluteLayout.top;
+    let left = handleAbsoluteLayout.left;
+    let width = handleAbsoluteLayout.width;
+    let height = handleAbsoluteLayout.height;
+    const bottom = handleAbsoluteLayout.top + handleAbsoluteLayout.height;
+    const right = handleAbsoluteLayout.left + handleAbsoluteLayout.width;
+    const boxAbsoluteLayoutBottom = boxAbsoluteLayout.top + boxAbsoluteLayout.height;
+    const boxAbsoluteLayoutRight = boxAbsoluteLayout.left + boxAbsoluteLayout.width;
+
+    if (handleAbsoluteLayout.top < boxAbsoluteLayout.top) {
+      height = bottom - boxAbsoluteLayout.top;
+      top = boxAbsoluteLayout.top;
+    }
+
+    if (handleAbsoluteLayout.left < boxAbsoluteLayout.left) {
+      width = right - boxAbsoluteLayout.left;
+      left = boxAbsoluteLayout.left;
+    }
+
+    if (bottom > boxAbsoluteLayoutBottom) {
+      height = boxAbsoluteLayoutBottom - handleAbsoluteLayout.top;
+    }
+
+    if (right > boxAbsoluteLayoutRight) {
+      width = boxAbsoluteLayoutRight - handleAbsoluteLayout.left;
+    }
+
+    this.setLayout({
+      ...handleAbsoluteLayout,
+      top,
+      left,
+      width,
+      height,
+      scaleX: 1,
+      scaleY: 1,
+    });
   }
 
-  getPosition(): Position {
-    return {
-      top: this.rect.get('top') || 0,
-      left: this.rect.get('left') || 0,
-    };
+  terminateMove(boxAbsoluteLayout: Layout) {
+    const handleAbsoluteLayout = this.getAbsoluteLayout();
+
+    let top = handleAbsoluteLayout.top;
+    let left = handleAbsoluteLayout.left;
+    const bottom = handleAbsoluteLayout.top + handleAbsoluteLayout.height;
+    const right = handleAbsoluteLayout.left + handleAbsoluteLayout.width;
+    const boxAbsoluteLayoutBottom = boxAbsoluteLayout.top + boxAbsoluteLayout.height;
+    const boxAbsoluteLayoutRight = boxAbsoluteLayout.left + boxAbsoluteLayout.width;
+
+    if (handleAbsoluteLayout.top < boxAbsoluteLayout.top) {
+      top = boxAbsoluteLayout.top;
+    }
+
+    if (handleAbsoluteLayout.left < boxAbsoluteLayout.left) {
+      left = boxAbsoluteLayout.left;
+    }
+
+    if (bottom > boxAbsoluteLayoutBottom) {
+      top = boxAbsoluteLayoutBottom - handleAbsoluteLayout.height;
+    }
+
+    if (right > boxAbsoluteLayoutRight) {
+      left = boxAbsoluteLayoutRight - handleAbsoluteLayout.width;
+    }
+
+    this.setLayout({
+      ...handleAbsoluteLayout,
+      top,
+      left,
+    });
   }
 
 }

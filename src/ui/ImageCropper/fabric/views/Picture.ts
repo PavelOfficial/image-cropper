@@ -4,6 +4,7 @@ import invariant from 'invariant';
 import { Layout, MODE, Position } from '../types';
 import { CropArea } from './CropArea';
 import { DEFAULT_MODE } from '../definitions';
+import { FabricView } from './FabricView';
 
 type Options = {
   cornerStyle: 'rect' | 'circle' | undefined,
@@ -30,7 +31,7 @@ type ModeOptions = {
 
 const emptyCropArea = new CropArea();
 
-export class Picture {
+export class Picture extends FabricView {
 
   static controlsVisibility = {
     [MODE.DRAGGING]: {
@@ -97,8 +98,13 @@ export class Picture {
   mode = DEFAULT_MODE;
 
   constructor(image: fabric.Image) {
+    super();
     this.image = image;
     this.updateImageWithMode();
+  }
+
+  get object() {
+    return this.image;
   }
 
   updateImageWithMode() {
@@ -142,8 +148,12 @@ export class Picture {
     }
   }
 
-  setLayout(layout: Layout) {
+  initLayout(layout: Layout) {
     this.cropArea = this.getCropArea(layout);
+    this.setLayout(layout);
+  }
+
+  setLayout(layout: Layout) {
     this.image.set({
       ...layout,
       clipPath: this.getClipPath(),
@@ -170,23 +180,12 @@ export class Picture {
     };
   }
 
-  getLayout(): Layout {
-    return {
-      width: this.image.get('width') || 0,
-      height: this.image.get('height') || 0,
-      top: this.image.get('top') || 0,
-      left: this.image.get('left') || 0,
-      scaleX: this.image.get('scaleX') || 0,
-      scaleY: this.image.get('scaleY') || 0,
-    };
-  }
-
   transformWithClipLayout(layout: Layout) {
     const pictureLayout = this.getLayout();
     const cropLayout = this.cropArea.getLayout();
     const absoluteClip = {
-      width: cropLayout.width * cropLayout.scaleX,
-      height: cropLayout.height * cropLayout.scaleY,
+      width: (cropLayout.width * cropLayout.scaleX) * pictureLayout.scaleX,
+      height: (cropLayout.height * cropLayout.scaleY) * pictureLayout.scaleY,
       left: pictureLayout.left + (pictureLayout.scaleX * ((pictureLayout.width / 2) + cropLayout.left)),
       top: pictureLayout.top + (pictureLayout.scaleY * ((pictureLayout.height / 2) + cropLayout.top)),
     };
@@ -202,8 +201,8 @@ export class Picture {
       ...pictureLayout,
       top: pictureLayout.top + deltaTop,
       left: pictureLayout.left + deltaLeft,
-      scaleX: absoluteLayout.width / absoluteClip.width,
-      scaleY: absoluteLayout.height / absoluteClip.height,
+      scaleX: absoluteLayout.width / cropLayout.width,
+      scaleY: absoluteLayout.height / cropLayout.height,
     });
   }
 

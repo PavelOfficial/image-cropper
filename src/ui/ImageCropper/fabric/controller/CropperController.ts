@@ -23,8 +23,13 @@ export class CropperController {
 
   unsubscribe = () => {
     const pictureHandleRect = this.cropperView.pictureHandle.getRect();
+
     pictureHandleRect.off('moving', this.updateWithPictureHandle);
     pictureHandleRect.off('scaling', this.updateWithPictureHandle);
+
+    // pictureHandleRect.off('moving', this.terminatePicture);
+    pictureHandleRect.off('scaling', this.terminatePicture);
+
     pictureHandleRect.off('mousedblclick', this.switchMode);
   };
 
@@ -32,9 +37,28 @@ export class CropperController {
     this.unsubscribe();
 
     const pictureHandleRect = this.cropperView.pictureHandle.getRect();
+
     pictureHandleRect.on('moving', this.updateWithPictureHandle);
     pictureHandleRect.on('scaling', this.updateWithPictureHandle);
+
+    // pictureHandleRect.on('moving', this.terminatePicture);
+    pictureHandleRect.on('scaling', this.terminatePicture);
+
     pictureHandleRect.on('mousedblclick', this.switchMode);
+  };
+
+  terminatePicture = () => {
+    if (this.mode === MODE.CROPPING) {
+      const layout = this.cropperView.picture.getAbsoluteLayout();
+      this.cropperView.pictureHandle.terminateScale(layout);
+    }
+  };
+
+  terminatePictureHandle = () => {
+    if (this.mode === MODE.CROPPING) {
+      const layout = this.cropperView.picture.getAbsoluteLayout();
+      this.cropperView.pictureHandle.terminateMove(layout);
+    }
   };
 
   updateWithPictureHandle = () => {
@@ -52,9 +76,15 @@ export class CropperController {
 
     this.cropperView.pictureHandle.setMode(this.mode);
     this.cropperView.picture.setMode(this.mode);
-    const layout = this.cropperView.pictureHandle.getLayout();
-    this.cropperView.picture.setClipLayout(layout);
-    this.cropperView.canvas.renderAll();
+
+    if (this.mode === MODE.DRAGGING) {
+      const layout = this.cropperView.pictureHandle.getLayout();
+      this.cropperView.picture.setClipLayout(layout);
+      this.cropperView.canvas.renderAll();
+    } else if (this.mode === MODE.CROPPING) {
+      this.applyPictureHandleToPicture();
+      this.cropperView.canvas.renderAll();
+    }
   };
 
   applyPictureHandleToPicture() {

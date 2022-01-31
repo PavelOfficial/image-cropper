@@ -1,13 +1,19 @@
 import { fabric } from 'fabric';
 
 import { Layout, Size } from '../types';
+import { FabricView } from './FabricView';
 
-export class CropArea {
+export class CropArea extends FabricView {
 
   rect: fabric.Rect;
 
   constructor() {
+    super();
     this.rect = new fabric.Rect({});
+  }
+
+  get object() {
+    return this.rect;
   }
 
   normalizeLayout(layout: Layout, pictureSize: Size) {
@@ -27,17 +33,6 @@ export class CropArea {
   setLayout(layout: Layout, pictureSize: Size) {
     layout = this.normalizeLayout(layout, pictureSize);
     this.rect.set(layout);
-  }
-
-  getLayout() {
-    return {
-      width: this.rect.get('width') || 0,
-      height: this.rect.get('height') || 0,
-      top: this.rect.get('top') || 0,
-      left: this.rect.get('left') || 0,
-      scaleX: this.rect.get('scaleX') || 0,
-      scaleY: this.rect.get('scaleY') || 0,
-    };
   }
 
   getRect() {

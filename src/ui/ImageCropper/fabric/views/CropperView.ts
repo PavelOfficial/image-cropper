@@ -33,6 +33,7 @@ export class CropperView {
     this.canvas = new fabric.Canvas(canvas, {
       width: this.width,
       height: this.height,
+      preserveObjectStacking: true,
     });
   }
 
@@ -56,7 +57,7 @@ export class CropperView {
   fitToCanvasCenter(picture: Picture) {
     const layout = geometry.fitToCenter(this.size, picture.getNaturalSize(), this.padding);
 
-    picture.setLayout(layout);
+    picture.initLayout(layout);
 
     return picture;
   }
