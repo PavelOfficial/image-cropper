@@ -14,10 +14,9 @@ export type Scale = {
   scaleY: number;
 };
 
-export enum WORKING_MODE {
+export enum MODE {
   DRAGGING = 'DRAGGING',
   CROPPING = 'CROPPING',
-  DEFAULT = 'DRAGGING',
 }
 
 export type Layout = Position & Scale & Size;

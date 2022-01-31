@@ -1,7 +1,8 @@
-import { fabric } from 'fabric';
-
 import { ImageLoader } from './ImageLoader';
 import { CropperView } from '../views/CropperView';
+import { DEFAULT_MODE } from '../definitions';
+
+import { MODE } from '../types';
 
 export class CropperController {
 
@@ -10,6 +11,8 @@ export class CropperController {
   imageLoader: ImageLoader;
 
   cropEditing = false;
+
+  mode = DEFAULT_MODE;
 
   constructor(htmlCanvas: HTMLCanvasElement) {
     this.imageLoader = new ImageLoader();
@@ -20,20 +23,40 @@ export class CropperController {
 
   unsubscribe = () => {
     const pictureHandleRect = this.cropperView.pictureHandle.getRect();
-
     pictureHandleRect.off('moving', this.updateWithPictureHandle);
     pictureHandleRect.off('scaling', this.updateWithPictureHandle);
+    pictureHandleRect.off('mousedblclick', this.switchMode);
   };
 
   subscribe = () => {
-    const pictureHandleRect = this.cropperView.pictureHandle.getRect();
     this.unsubscribe();
 
+    const pictureHandleRect = this.cropperView.pictureHandle.getRect();
     pictureHandleRect.on('moving', this.updateWithPictureHandle);
     pictureHandleRect.on('scaling', this.updateWithPictureHandle);
+    pictureHandleRect.on('mousedblclick', this.switchMode);
   };
 
   updateWithPictureHandle = () => {
+    if (this.mode === MODE.DRAGGING) {
+      this.applyPictureHandleToPicture();
+    }
+  };
+
+  switchMode = () => {
+    if (this.mode === MODE.DRAGGING) {
+      this.mode = MODE.CROPPING;
+    } else if (this.mode === MODE.CROPPING) {
+      this.mode = MODE.DRAGGING;
+    }
+
+    this.cropperView.pictureHandle.setMode(this.mode);
+    this.cropperView.picture.setMode(this.mode);
+    this.applyPictureHandleToPicture();
+    this.cropperView.canvas.renderAll();
+  };
+
+  applyPictureHandleToPicture() {
     const layout = this.cropperView.pictureHandle.getLayout();
     this.cropperView.picture.setLayout(layout);
   };

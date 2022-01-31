@@ -1,8 +1,9 @@
 import { fabric } from 'fabric';
 import invariant from 'invariant';
 
-import { Layout, WORKING_MODE, Position } from '../types';
+import { Layout, MODE, Position } from '../types';
 import { CropArea } from './CropArea';
+import { DEFAULT_MODE } from '../definitions';
 
 type Options = {
   cornerStyle: 'rect' | 'circle' | undefined,
@@ -23,8 +24,8 @@ type Options = {
 };
 
 type ModeOptions = {
-  [WORKING_MODE.DRAGGING]: Options,
-  [WORKING_MODE.CROPPING]: Options,
+  [MODE.DRAGGING]: Options,
+  [MODE.CROPPING]: Options,
 };
 
 const emptyCropArea = new CropArea();
@@ -32,7 +33,7 @@ const emptyCropArea = new CropArea();
 export class Picture {
 
   static controlsVisibility = {
-    [WORKING_MODE.DRAGGING]: {
+    [MODE.DRAGGING]: {
       bl: false,
       br: false,
       tl: false,
@@ -43,7 +44,7 @@ export class Picture {
       mt: false,
       mtr: false,
     },
-    [WORKING_MODE.CROPPING]: {
+    [MODE.CROPPING]: {
       bl: true,
       br: true,
       tl: true,
@@ -57,7 +58,7 @@ export class Picture {
   };
 
   static options: ModeOptions = {
-    [WORKING_MODE.DRAGGING]: {
+    [MODE.DRAGGING]: {
       cornerStyle: 'circle',
       cornerSize: 10,
       cornerColor: '#f4fdfd',
@@ -72,7 +73,7 @@ export class Picture {
       moveCursor: 'default',
       selectable: false,
     },
-    [WORKING_MODE.CROPPING]: {
+    [MODE.CROPPING]: {
       cornerStyle: 'circle',
       cornerSize: 10,
       cornerColor: '#f4fdfd',
@@ -81,8 +82,8 @@ export class Picture {
 
       hasBorders: true,
       lockScalingFlip: true,
-      lockMovementX: true,
-      lockMovementY: true,
+      lockMovementX: false,
+      lockMovementY: false,
       hoverCursor: undefined,
       moveCursor: undefined,
       selectable: true,
@@ -93,12 +94,21 @@ export class Picture {
 
   image: fabric.Image;
 
-  mode = WORKING_MODE.DEFAULT;
+  mode = DEFAULT_MODE;
 
   constructor(image: fabric.Image) {
     this.image = image;
+    this.updateImageWithMode();
+  }
+
+  updateImageWithMode() {
     this.image.set(Picture.options[this.mode]);
     this.image.setControlsVisibility(Picture.controlsVisibility[this.mode]);
+  }
+
+  setMode(nextMode: MODE) {
+    this.mode = nextMode;
+    this.updateImageWithMode();
   }
 
   setPosition(position: Position) {

@@ -1,5 +1,7 @@
 import { fabric } from 'fabric';
-import { Layout, Position } from '../types';
+
+import { Layout, MODE, Position } from '../types';
+import { DEFAULT_MODE } from '../definitions';
 
 type Options = {
   cornerStyle: 'circle' | 'rect' | undefined,
@@ -15,43 +17,90 @@ type Options = {
   strokeWidth: number,
   stroke: string,
   fill: string,
-}
+};
+
+type ModeOptions = {
+  [MODE.DRAGGING]: Options,
+  [MODE.CROPPING]: Options,
+};
 
 export class PictureHandle {
 
-  rect: fabric.Rect;
+  static options: ModeOptions = {
+    [MODE.DRAGGING]: {
+      cornerStyle: 'circle',
+      cornerSize: 10,
+      cornerColor: '#f4fdfd',
+      transparentCorners: false,
+      cornerStrokeColor: '#226fd9',
+      lockScalingFlip: true,
+      strokeUniform: true,
+      noScaleCache: true,
 
-  static options: Options = {
-    cornerStyle: 'circle',
-    cornerSize: 10,
-    cornerColor: '#f4fdfd',
-    transparentCorners: false,
-    cornerStrokeColor: '#226fd9',
-    lockScalingFlip: true,
-    strokeUniform: true,
-    noScaleCache: true,
+      hasBorders: false,
+      stroke: '#1456b6',
+      strokeWidth: 2,
+      fill:'transparent',
+    },
+    [MODE.CROPPING]: {
+      cornerStyle: 'rect',
+      cornerSize: 10,
+      cornerColor: '#f4fdfd',
+      transparentCorners: false,
+      cornerStrokeColor: '#226fd9',
+      lockScalingFlip: true,
+      strokeUniform: true,
+      noScaleCache: true,
 
-    hasBorders: false,
-    stroke: '#1456b6',
-    strokeWidth: 2,
-    fill:'transparent',
+      hasBorders: false,
+      stroke: '#1456b6',
+      strokeWidth: 2,
+      fill:'transparent',
+    },
   };
 
   static controlsVisibility = {
-    'bl': true,
-    'br': true,
-    'tl': true,
-    'tr': true,
-    'mb': false,
-    'ml': false,
-    'mr': false,
-    'mt': false,
-    'mtr': false,
+    [MODE.DRAGGING]: {
+      'bl': true,
+      'br': true,
+      'tl': true,
+      'tr': true,
+      'mb': false,
+      'ml': false,
+      'mr': false,
+      'mt': false,
+      'mtr': false,
+    },
+    [MODE.CROPPING]: {
+      'bl': false,
+      'br': false,
+      'tl': false,
+      'tr': false,
+      'mb': true,
+      'ml': true,
+      'mr': true,
+      'mt': true,
+      'mtr': false,
+    },
   };
 
+  rect: fabric.Rect;
+
+  mode:MODE = DEFAULT_MODE;
+
   constructor() {
-    this.rect = new fabric.Rect(PictureHandle.options);
-    this.rect.setControlsVisibility(PictureHandle.controlsVisibility);
+    this.rect = new fabric.Rect({});
+    this.updateRectWithMode();
+  }
+
+  updateRectWithMode() {
+    this.rect = this.rect.set(PictureHandle.options[this.mode]);
+    this.rect.setControlsVisibility(PictureHandle.controlsVisibility[this.mode]);
+  }
+
+  setMode(nextMode: MODE) {
+    this.mode = nextMode;
+    this.updateRectWithMode();
   }
 
   getRect() {
