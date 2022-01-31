@@ -56,7 +56,7 @@ export class CropperView {
   fitToCanvasCenter(picture: Picture) {
     const layout = geometry.fitToCenter(this.size, picture.getNaturalSize(), this.padding);
 
-    picture.initLayout(layout);
+    picture.setLayout(layout);
 
     return picture;
   }

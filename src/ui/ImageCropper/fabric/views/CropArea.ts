@@ -1,6 +1,6 @@
 import { fabric } from 'fabric';
 
-import { Layout } from '../types';
+import { Layout, Size } from '../types';
 
 export class CropArea {
 
@@ -10,13 +10,13 @@ export class CropArea {
     this.rect = new fabric.Rect({});
   }
 
-  normalizeLayout(layout: Layout) {
+  normalizeLayout(layout: Layout, pictureSize: Size) {
     const width = layout.width;
     const height = layout.height;
 
     return {
-      left: -(layout.width / 2),
-      top: -(layout.height / 2),
+      left: layout.left - (pictureSize.width / 2),
+      top: layout.top - (pictureSize.height / 2),
       width: width,
       height: height,
       scaleX: 1,
@@ -24,9 +24,20 @@ export class CropArea {
     };
   }
 
-  setLayout(layout: Layout) {
-    layout = this.normalizeLayout(layout);
+  setLayout(layout: Layout, pictureSize: Size) {
+    layout = this.normalizeLayout(layout, pictureSize);
     this.rect.set(layout);
+  }
+
+  getLayout() {
+    return {
+      width: this.rect.get('width') || 0,
+      height: this.rect.get('height') || 0,
+      top: this.rect.get('top') || 0,
+      left: this.rect.get('left') || 0,
+      scaleX: this.rect.get('scaleX') || 0,
+      scaleY: this.rect.get('scaleY') || 0,
+    };
   }
 
   getRect() {

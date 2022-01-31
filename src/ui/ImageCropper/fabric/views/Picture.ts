@@ -102,7 +102,11 @@ export class Picture {
   }
 
   updateImageWithMode() {
-    this.image.set(Picture.options[this.mode]);
+    this.image.set({
+      ...Picture.options[this.mode],
+      clipPath: this.getClipPath(),
+    });
+
     this.image.setControlsVisibility(Picture.controlsVisibility[this.mode]);
   }
 
@@ -118,16 +122,31 @@ export class Picture {
   getCropArea(layout: Layout) {
     const cropArea = new CropArea();
 
-    cropArea.setLayout(layout);
+    cropArea.setLayout({
+      ...layout,
+      top: 0,
+      left: 0,
+    }, {
+      width: layout.width,
+      height: layout.height,
+    });
 
     return cropArea;
   }
 
-  initLayout(layout: Layout) {
+  getClipPath() {
+    if (this.mode === MODE.DRAGGING) {
+      return this.cropArea.getRect();
+    } else if (this.mode === MODE.CROPPING) {
+      return undefined;
+    }
+  }
+
+  setLayout(layout: Layout) {
     this.cropArea = this.getCropArea(layout);
     this.image.set({
       ...layout,
-      clipPath: this.cropArea.getRect(),
+      clipPath: this.getClipPath(),
     });
   }
 
@@ -157,15 +176,63 @@ export class Picture {
       height: this.image.get('height') || 0,
       top: this.image.get('top') || 0,
       left: this.image.get('left') || 0,
-      scaleX: this.image.get('scaleX') || 1,
-      scaleY: this.image.get('scaleY') || 1,
+      scaleX: this.image.get('scaleX') || 0,
+      scaleY: this.image.get('scaleY') || 0,
     };
   }
 
-  setLayout(layout: Layout) {
-    layout = this.normalizeLayout(layout);
-    this.image.set({
-      ...layout,
+  transformWithClipLayout(layout: Layout) {
+    const pictureLayout = this.getLayout();
+    const cropLayout = this.cropArea.getLayout();
+    const absoluteClip = {
+      width: cropLayout.width * cropLayout.scaleX,
+      height: cropLayout.height * cropLayout.scaleY,
+      left: pictureLayout.left + (pictureLayout.scaleX * ((pictureLayout.width / 2) + cropLayout.left)),
+      top: pictureLayout.top + (pictureLayout.scaleY * ((pictureLayout.height / 2) + cropLayout.top)),
+    };
+
+    const deltaLeft = layout.left - absoluteClip.left;
+    const deltaTop = layout.top - absoluteClip.top;
+    const absoluteLayout = {
+      width: layout.width * layout.scaleX,
+      height: layout.height * layout.scaleY,
+    };
+
+    this.setLayout({
+      ...pictureLayout,
+      top: pictureLayout.top + deltaTop,
+      left: pictureLayout.left + deltaLeft,
+      scaleX: absoluteLayout.width / absoluteClip.width,
+      scaleY: absoluteLayout.height / absoluteClip.height,
+    });
+  }
+
+  setClipLayout(clipLayout: Layout) {
+    const pictureLayout = this.getLayout();
+    const absolutePictureLayout = {
+      top: pictureLayout.top,
+      left: pictureLayout.left,
+      width: pictureLayout.width * pictureLayout.scaleX,
+      height: pictureLayout.height * pictureLayout.scaleY,
+    };
+
+    const absoluteClipLayout = {
+      top: clipLayout.top,
+      left: clipLayout.left,
+      width: clipLayout.width * clipLayout.scaleX,
+      height: clipLayout.height * clipLayout.scaleY,
+    };
+
+    this.cropArea.setLayout({
+      width: (absoluteClipLayout.width / absolutePictureLayout.width) * pictureLayout.width,
+      height: (absoluteClipLayout.height / absolutePictureLayout.height) * pictureLayout.height,
+      top: (absoluteClipLayout.top - absolutePictureLayout.top) / pictureLayout.scaleY,
+      left: (absoluteClipLayout.left - absolutePictureLayout.left) / pictureLayout.scaleX,
+      scaleX: 1,
+      scaleY: 1,
+    }, {
+      width: pictureLayout.width,
+      height: pictureLayout.height,
     });
   }
 

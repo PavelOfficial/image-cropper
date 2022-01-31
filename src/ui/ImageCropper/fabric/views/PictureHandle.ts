@@ -129,8 +129,8 @@ export class PictureHandle {
       height: this.rect.get('height') || 0,
       top: this.rect.get('top') || 0,
       left: this.rect.get('left') || 0,
-      scaleX: this.rect.get('scaleX') || 1,
-      scaleY: this.rect.get('scaleY') || 1,
+      scaleX: this.rect.get('scaleX') || 0,
+      scaleY: this.rect.get('scaleY') || 0,
     };
   }
 

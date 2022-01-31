@@ -52,13 +52,14 @@ export class CropperController {
 
     this.cropperView.pictureHandle.setMode(this.mode);
     this.cropperView.picture.setMode(this.mode);
-    this.applyPictureHandleToPicture();
+    const layout = this.cropperView.pictureHandle.getLayout();
+    this.cropperView.picture.setClipLayout(layout);
     this.cropperView.canvas.renderAll();
   };
 
   applyPictureHandleToPicture() {
     const layout = this.cropperView.pictureHandle.getLayout();
-    this.cropperView.picture.setLayout(layout);
+    this.cropperView.picture.transformWithClipLayout(layout);
   };
 
   setCropEditing(isCropEditing: boolean) {
