@@ -31,12 +31,18 @@ export class CropperController {
     pictureHandleRect.off('scaling', this.updateWithPictureHandle);
 
     // pictureHandleRect.off('moving', this.terminatePicture);
-    pictureHandleRect.off('scaling', this.terminatePicture);
+    pictureHandleRect.off('scaling', this.terminatePictureHandle);
 
-    pictureHandleRect.on('mousedown', this.startMoving);
+    pictureHandleRect.off('mousedown', this.startMoving);
     pictureHandleRect.off('moving', this.translateMoving);
+    pictureHandleRect.off('moving', this.terminatePictureMoving);
 
     pictureHandleRect.off('mousedblclick', this.switchMode);
+
+    const image = this.cropperView.picture.getImage();
+
+    image.on('moving', this.terminatePictureMoving);
+    image.on('scaling', this.terminatePictureScaling);
   };
 
   subscribe = () => {
@@ -48,12 +54,18 @@ export class CropperController {
     pictureHandleRect.on('scaling', this.updateWithPictureHandle);
 
     // pictureHandleRect.on('moving', this.terminatePicture);
-    pictureHandleRect.on('scaling', this.terminatePicture);
+    pictureHandleRect.on('scaling', this.terminatePictureHandle);
 
     pictureHandleRect.on('mousedown', this.startMoving);
     pictureHandleRect.on('moving', this.translateMoving);
+    pictureHandleRect.on('moving', this.terminatePictureMoving);
 
     pictureHandleRect.on('mousedblclick', this.switchMode);
+
+    const image = this.cropperView.picture.getImage();
+
+    image.on('moving', this.terminatePictureMoving);
+    image.on('scaling', this.terminatePictureScaling);
   };
 
   startMoving = () => {
@@ -73,17 +85,24 @@ export class CropperController {
     }
   };
 
-  terminatePicture = () => {
+  terminatePictureHandle = () => {
     if (this.mode === MODE.CROPPING) {
       const layout = this.cropperView.picture.getAbsoluteLayout();
       this.cropperView.pictureHandle.terminateScale(layout);
     }
   };
 
-  terminatePictureHandle = () => {
+  terminatePictureMoving = () => {
     if (this.mode === MODE.CROPPING) {
-      const layout = this.cropperView.picture.getAbsoluteLayout();
-      this.cropperView.pictureHandle.terminateMove(layout);
+      const layout = this.cropperView.pictureHandle.getAbsoluteLayout();
+      this.cropperView.picture.terminateMoving(layout);
+    }
+  };
+
+  terminatePictureScaling = () => {
+    if (this.mode === MODE.CROPPING) {
+      const layout = this.cropperView.pictureHandle.getAbsoluteLayout();
+      this.cropperView.picture.terminateScaling(layout);
     }
   };
 

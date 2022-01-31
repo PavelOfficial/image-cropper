@@ -178,39 +178,6 @@ export class PictureHandle extends FabricView {
     });
   }
 
-  terminateMove(boxAbsoluteLayout: Layout) {
-    const handleAbsoluteLayout = this.getAbsoluteLayout();
-
-    let top = handleAbsoluteLayout.top;
-    let left = handleAbsoluteLayout.left;
-    const bottom = handleAbsoluteLayout.top + handleAbsoluteLayout.height;
-    const right = handleAbsoluteLayout.left + handleAbsoluteLayout.width;
-    const boxAbsoluteLayoutBottom = boxAbsoluteLayout.top + boxAbsoluteLayout.height;
-    const boxAbsoluteLayoutRight = boxAbsoluteLayout.left + boxAbsoluteLayout.width;
-
-    if (handleAbsoluteLayout.top < boxAbsoluteLayout.top) {
-      top = boxAbsoluteLayout.top;
-    }
-
-    if (handleAbsoluteLayout.left < boxAbsoluteLayout.left) {
-      left = boxAbsoluteLayout.left;
-    }
-
-    if (bottom > boxAbsoluteLayoutBottom) {
-      top = boxAbsoluteLayoutBottom - handleAbsoluteLayout.height;
-    }
-
-    if (right > boxAbsoluteLayoutRight) {
-      left = boxAbsoluteLayoutRight - handleAbsoluteLayout.width;
-    }
-
-    this.setLayout({
-      ...handleAbsoluteLayout,
-      top,
-      left,
-    });
-  }
-
   setPosition(position: Position) {
     this.rect.set(position);
   }

@@ -273,21 +273,41 @@ export class Picture extends FabricView {
     return this.image;
   }
 
-  startMovingApplying() {
-    this.startMovingPosition = {
-      top: this.image.get('top') || 0,
-      left: this.image.get('left') || 0,
-    };
-  }
+  terminateMoving(fixedInner: Layout) {
+    const pictureAbsoluteLayout = this.getAbsoluteLayout();
 
-  applyMoving(moving: Position) {
-    const layout = this.getLayout();
+    let top = pictureAbsoluteLayout.top;
+    let left = pictureAbsoluteLayout.left;
+    const bottom = pictureAbsoluteLayout.top + pictureAbsoluteLayout.height;
+    const right = pictureAbsoluteLayout.left + pictureAbsoluteLayout.width;
+    const fixedInnerBottom = fixedInner.top + fixedInner.height;
+    const fixedInnerRight = fixedInner.left + fixedInner.width;
+
+    if (pictureAbsoluteLayout.top > fixedInner.top) {
+      top = fixedInner.top;
+    }
+
+    if (pictureAbsoluteLayout.left > fixedInner.left) {
+      left = fixedInner.left;
+    }
+
+    if (bottom < fixedInnerBottom) {
+      top = fixedInnerBottom - pictureAbsoluteLayout.height;
+    }
+
+    if (right < fixedInnerRight) {
+      left = fixedInnerRight - pictureAbsoluteLayout.width;
+    }
 
     this.setLayout({
-      ...layout,
-      top: this.startMovingPosition.top + moving.top,
-      left: this.startMovingPosition.left + moving.left,
+      ...this.getLayout(),
+      top,
+      left,
     });
+  }
+
+  terminateScaling(layout: Layout) {
+
   }
 
 }
