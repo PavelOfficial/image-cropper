@@ -4,6 +4,7 @@ import { DEFAULT_MODE } from '../definitions';
 
 import { MODE } from '../types';
 import { NullMovingTransition, MovingTransition } from '../geometry/MovingTransition';
+import {fabric} from "fabric";
 
 export class CropperController {
 
@@ -99,10 +100,10 @@ export class CropperController {
     }
   };
 
-  terminatePictureScaling = () => {
+  terminatePictureScaling = (event: any) => {
     if (this.mode === MODE.CROPPING) {
       const layout = this.cropperView.pictureHandle.getAbsoluteLayout();
-      this.cropperView.picture.terminateScaling(layout);
+      this.cropperView.picture.terminateScaling(layout, event.transform.corner);
     }
   };
 

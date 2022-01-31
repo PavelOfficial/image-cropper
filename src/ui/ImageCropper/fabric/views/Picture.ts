@@ -309,91 +309,90 @@ export class Picture extends FabricView {
     });
   }
 
-  terminateScaling(fixedInner: Layout) {
+  terminateScaling(fixedInner: Layout, corner: string) {
     const pictureAbsoluteLayout = this.getAbsoluteLayout();
     const layout = this.getLayout();
-    let top = pictureAbsoluteLayout.top;
-    let left = pictureAbsoluteLayout.left;
-    let width = pictureAbsoluteLayout.width;
-    let height = pictureAbsoluteLayout.height;
-    let scale = layout.scaleX;
-    let lastScale = -Infinity;
     const bottom = pictureAbsoluteLayout.top + pictureAbsoluteLayout.height;
     const right = pictureAbsoluteLayout.left + pictureAbsoluteLayout.width;
     const fixedInnerBottom = fixedInner.top + fixedInner.height;
     const fixedInnerRight = fixedInner.left + fixedInner.width;
 
+    type Solution = {
+      scale: number;
+      top: number;
+      left: number;
+      prime: boolean
+    };
+
+    const solutions: Solution[] = [{
+      scale: layout.scaleX,
+      top: layout.top,
+      left: layout.left,
+      prime: true,
+    }];
+
     if (pictureAbsoluteLayout.top > fixedInner.top) {
-      const prevHeight = height;
-      const prevTop = top;
+      const nextHeight = bottom - fixedInner.top;
+      const scale = nextHeight / layout.height;
 
-      height = bottom - fixedInner.top;
-      top = fixedInner.top;
-
-      scale = height / layout.height;
-
-      if (lastScale > scale) {
-        height = prevHeight;
-        top = prevTop;
-        scale = lastScale;
-      } else {
-        lastScale = scale;
-      }
+      solutions.push({
+        top: fixedInner.top,
+        left: corner === 'tl' ? (right - (layout.width * scale)) : layout.left,
+        scale,
+        prime: false,
+      });
     }
 
     if (pictureAbsoluteLayout.left > fixedInner.left) {
-      const prevWidth = width;
-      const prevLeft = left;
+      const nextWidth = right - fixedInner.left;
+      const scale = nextWidth / layout.width;
 
-      width = right - fixedInner.left;
-      left = fixedInner.left;
-
-      scale = width / layout.width;
-
-      if (lastScale > scale) {
-        width = prevWidth;
-        left = prevLeft;
-        scale = lastScale;
-      } else {
-        lastScale = scale;
-      }
+      solutions.push({
+        top: corner === 'tl' ? (bottom - (layout.height * scale)) : layout.top,
+        left: fixedInner.left,
+        scale,
+        prime: false,
+      });
     }
 
     if (bottom < fixedInnerBottom) {
-      const revHeight = height;
+      const nextHeight = fixedInnerBottom - pictureAbsoluteLayout.top;
+      const scale = nextHeight / layout.height;
 
-      height = fixedInnerBottom - pictureAbsoluteLayout.top;
-      scale = height / layout.height;
-
-      if (lastScale > scale) {
-        height = revHeight;
-        scale = lastScale;
-      } else {
-        lastScale = scale;
-      }
+      solutions.push({
+        top: layout.top,
+        left: corner === 'bl' ? (right - (layout.width * scale)) : layout.left,
+        scale,
+        prime: false,
+      });
     }
 
     if (right < fixedInnerRight) {
-      const revWidth = width;
+      const nextWidth = fixedInnerRight - pictureAbsoluteLayout.left;
+      const scale = nextWidth / layout.width;
 
-      width = fixedInnerRight - pictureAbsoluteLayout.left;
-
-      scale = width / layout.width;
-
-      if (lastScale > scale) {
-        width = revWidth;
-        scale = lastScale;
-      } else {
-        lastScale = scale;
-      }
+      solutions.push({
+        top: corner === 'tr' ? (bottom - (layout.height * scale)) : layout.top,
+        left: layout.left,
+        scale,
+        prime: false,
+      });
     }
+
+    const solution = solutions.reduce((result, item) => {
+      if ((item.scale > result.scale) || (result.prime && !item.prime)) {
+        result = item;
+      }
+
+      return result;
+    });
 
     this.setLayout({
       ...layout,
-      top,
-      left,
-      scaleX: scale,
-      scaleY: scale,
+      top: solution.top === undefined ? layout.top : solution.top,
+      left: solution.left === undefined ? layout.left : solution.left,
+      scaleX: solution.scale,
+      scaleY: solution.scale,
     });
   }
 

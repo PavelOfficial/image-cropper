@@ -94,35 +94,3 @@ export class CropperView {
   }
 
 }
-
-/*
-
-handleDblclick = (event: IEvent<MouseEvent>) => {
-  if (event.target === this.image) {
-    this.setCropEditing(!this.cropEditing);
-    console.log('image clicked !!!');
-  }
-
-  /*
-    setTimeout(() => {
-      if (this.image) {
-        this.canvas.setActiveObject(this.image);
-        this.canvas.renderAll(); // Use canvas render all for to update selection
-      }
-    }, 500);
-   */
-
-  // setTimeout(() => {
-  //   if (this.image) {
-  //     this.canvas.getObjects().forEach((o) => {
-  //       this.canvas.setActiveObject(o);
-  //     });
-  //     /*
-  //       this.canvas.setActiveObject(o);
-  //       this.canvas.setActiveObject(this.image);
-  //      */
-  //     // this.canvas.setActiveObject(this.canvas.item(0));
-  //   }
-  // }, 500);
-// }
-
