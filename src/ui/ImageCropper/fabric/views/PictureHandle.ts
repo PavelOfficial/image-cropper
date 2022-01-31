@@ -1,6 +1,6 @@
 import { fabric } from 'fabric';
 
-import { Layout, MODE } from '../types';
+import { Layout, MODE, Position } from '../types';
 import { DEFAULT_MODE } from '../definitions';
 import { FabricView } from './FabricView';
 
@@ -83,6 +83,15 @@ export class PictureHandle extends FabricView {
       'mt': true,
       'mtr': false,
     },
+  };
+
+  lastLayout: Layout = {
+    top: 0,
+    left: 0,
+    width: 0,
+    height: 0,
+    scaleX: 0,
+    scaleY: 0,
   };
 
   rect: fabric.Rect;
@@ -200,6 +209,10 @@ export class PictureHandle extends FabricView {
       top,
       left,
     });
+  }
+
+  setPosition(position: Position) {
+    this.rect.set(position);
   }
 
 }

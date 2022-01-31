@@ -115,6 +115,11 @@ export class Picture extends FabricView {
 
   mode = DEFAULT_MODE;
 
+  startMovingPosition:Position = {
+    top: 0,
+    left: 0,
+  };
+
   constructor(image: fabric.Image) {
     super();
     this.image = image;
@@ -266,6 +271,23 @@ export class Picture extends FabricView {
 
   getImage() {
     return this.image;
+  }
+
+  startMovingApplying() {
+    this.startMovingPosition = {
+      top: this.image.get('top') || 0,
+      left: this.image.get('left') || 0,
+    };
+  }
+
+  applyMoving(moving: Position) {
+    const layout = this.getLayout();
+
+    this.setLayout({
+      ...layout,
+      top: this.startMovingPosition.top + moving.top,
+      left: this.startMovingPosition.left + moving.left,
+    });
   }
 
 }

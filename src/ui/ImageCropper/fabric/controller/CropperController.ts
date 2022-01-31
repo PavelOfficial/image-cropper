@@ -3,12 +3,15 @@ import { CropperView } from '../views/CropperView';
 import { DEFAULT_MODE } from '../definitions';
 
 import { MODE } from '../types';
+import { NullMovingTransition, MovingTransition } from '../geometry/MovingTransition';
 
 export class CropperController {
 
   cropperView: CropperView;
 
   imageLoader: ImageLoader;
+
+  handleToPictureMoving: MovingTransition = new NullMovingTransition();
 
   cropEditing = false;
 
@@ -30,6 +33,9 @@ export class CropperController {
     // pictureHandleRect.off('moving', this.terminatePicture);
     pictureHandleRect.off('scaling', this.terminatePicture);
 
+    pictureHandleRect.on('mousedown', this.startMoving);
+    pictureHandleRect.off('moving', this.translateMoving);
+
     pictureHandleRect.off('mousedblclick', this.switchMode);
   };
 
@@ -44,7 +50,27 @@ export class CropperController {
     // pictureHandleRect.on('moving', this.terminatePicture);
     pictureHandleRect.on('scaling', this.terminatePicture);
 
+    pictureHandleRect.on('mousedown', this.startMoving);
+    pictureHandleRect.on('moving', this.translateMoving);
+
     pictureHandleRect.on('mousedblclick', this.switchMode);
+  };
+
+  startMoving = () => {
+    if (this.mode === MODE.CROPPING) {
+      const targetView = this.cropperView.picture;
+      const originView = this.cropperView.pictureHandle;
+      this.handleToPictureMoving = new MovingTransition(
+        targetView,
+        originView,
+      );
+    }
+  };
+
+  translateMoving = () => {
+    if (this.mode === MODE.CROPPING) {
+      this.handleToPictureMoving.translate();
+    }
   };
 
   terminatePicture = () => {

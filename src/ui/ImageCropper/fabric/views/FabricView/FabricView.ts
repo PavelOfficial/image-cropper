@@ -1,5 +1,6 @@
 import { fabric } from 'fabric';
-import { Layout } from '../types';
+
+import { Layout, Position } from '../../types';
 
 export abstract class FabricView {
 
@@ -36,6 +37,17 @@ export abstract class FabricView {
       scaleX: 1,
       scaleY: 1,
     };
+  }
+
+  getPosition():Position {
+    return {
+      top: this.object.get('top') || 0,
+      left: this.object.get('left') || 0,
+    };
+  }
+
+  setPosition(position: Position) {
+    this.object.set(position);
   }
 
 }

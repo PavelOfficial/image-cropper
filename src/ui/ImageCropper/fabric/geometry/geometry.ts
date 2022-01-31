@@ -1,4 +1,4 @@
-import { Layout, Size } from './types';
+import { Layout, Size } from '../types';
 
 const getScale = (container: Size, object: Size, padding: number) => {
   const axisPadding = 2 * padding;
