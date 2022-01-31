@@ -41,8 +41,8 @@ export class CropperController {
 
     const image = this.cropperView.picture.getImage();
 
-    image.on('moving', this.terminatePictureMoving);
-    image.on('scaling', this.terminatePictureScaling);
+    image.off('moving', this.terminatePictureMoving);
+    image.off('scaling', this.terminatePictureScaling);
   };
 
   subscribe = () => {

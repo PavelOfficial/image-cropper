@@ -17,6 +17,7 @@ type Options = {
   lockScalingFlip: boolean,
   lockMovementX: boolean,
   lockMovementY: boolean,
+  lockUniScaling: boolean,
 
   hoverCursor: string | undefined,
   moveCursor: string | undefined,
@@ -76,6 +77,7 @@ export class Picture extends FabricView {
       lockScalingFlip: true,
       lockMovementX: true,
       lockMovementY: true,
+      lockUniScaling: true,
       hoverCursor: 'default',
       moveCursor: 'default',
       selectable: false,
@@ -97,6 +99,7 @@ export class Picture extends FabricView {
       lockScalingFlip: true,
       lockMovementX: false,
       lockMovementY: false,
+      lockUniScaling: true,
       hoverCursor: undefined,
       moveCursor: undefined,
       selectable: true,
@@ -306,8 +309,92 @@ export class Picture extends FabricView {
     });
   }
 
-  terminateScaling(layout: Layout) {
+  terminateScaling(fixedInner: Layout) {
+    const pictureAbsoluteLayout = this.getAbsoluteLayout();
+    const layout = this.getLayout();
+    let top = pictureAbsoluteLayout.top;
+    let left = pictureAbsoluteLayout.left;
+    let width = pictureAbsoluteLayout.width;
+    let height = pictureAbsoluteLayout.height;
+    let scale = layout.scaleX;
+    let lastScale = -Infinity;
+    const bottom = pictureAbsoluteLayout.top + pictureAbsoluteLayout.height;
+    const right = pictureAbsoluteLayout.left + pictureAbsoluteLayout.width;
+    const fixedInnerBottom = fixedInner.top + fixedInner.height;
+    const fixedInnerRight = fixedInner.left + fixedInner.width;
 
+    if (pictureAbsoluteLayout.top > fixedInner.top) {
+      const prevHeight = height;
+      const prevTop = top;
+
+      height = bottom - fixedInner.top;
+      top = fixedInner.top;
+
+      scale = height / layout.height;
+
+      if (lastScale > scale) {
+        height = prevHeight;
+        top = prevTop;
+        scale = lastScale;
+      } else {
+        lastScale = scale;
+      }
+    }
+
+    if (pictureAbsoluteLayout.left > fixedInner.left) {
+      const prevWidth = width;
+      const prevLeft = left;
+
+      width = right - fixedInner.left;
+      left = fixedInner.left;
+
+      scale = width / layout.width;
+
+      if (lastScale > scale) {
+        width = prevWidth;
+        left = prevLeft;
+        scale = lastScale;
+      } else {
+        lastScale = scale;
+      }
+    }
+
+    if (bottom < fixedInnerBottom) {
+      const revHeight = height;
+
+      height = fixedInnerBottom - pictureAbsoluteLayout.top;
+      scale = height / layout.height;
+
+      if (lastScale > scale) {
+        height = revHeight;
+        scale = lastScale;
+      } else {
+        lastScale = scale;
+      }
+    }
+
+    if (right < fixedInnerRight) {
+      const revWidth = width;
+
+      width = fixedInnerRight - pictureAbsoluteLayout.left;
+
+      scale = width / layout.width;
+
+      if (lastScale > scale) {
+        width = revWidth;
+        scale = lastScale;
+      } else {
+        lastScale = scale;
+      }
+    }
+
+    this.setLayout({
+      ...layout,
+      top,
+      left,
+      scaleX: scale,
+      scaleY: scale,
+    });
   }
 
 }
