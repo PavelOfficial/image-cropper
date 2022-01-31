@@ -34,6 +34,7 @@ export class CropperView {
       width: this.width,
       height: this.height,
       preserveObjectStacking: true,
+      selection: false,
     });
   }
 
