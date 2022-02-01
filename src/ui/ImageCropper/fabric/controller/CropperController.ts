@@ -138,11 +138,6 @@ export class CropperController {
     this.cropperView.picture.transformWithClipLayout(layout);
   };
 
-  setCropEditing(isCropEditing: boolean) {
-    this.cropEditing = isCropEditing;
-    console.log(this.cropEditing);
-  }
-
   async newImage(imageSrc: string) {
     try {
       let image = await this.imageLoader.load(imageSrc);
