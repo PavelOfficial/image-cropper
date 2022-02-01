@@ -4,7 +4,6 @@ import { DEFAULT_MODE } from '../definitions';
 
 import { MODE } from '../types';
 import { NullMovingTransition, MovingTransition } from '../geometry/MovingTransition';
-import {fabric} from "fabric";
 
 export class CropperController {
 
