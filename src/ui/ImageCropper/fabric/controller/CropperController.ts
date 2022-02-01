@@ -14,8 +14,6 @@ export class CropperController {
 
   handleToPictureMoving: MovingTransition = new NullMovingTransition();
 
-  cropEditing = false;
-
   mode = DEFAULT_MODE;
 
   constructor(htmlCanvas: HTMLCanvasElement) {
